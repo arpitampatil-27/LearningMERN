@@ -9,7 +9,7 @@ router.get("/hello", (req, res) => {
     res.json({ message: "Hello from backend" });
 });
 
-router.post("/data",(req, res) => {
+router.post("/data", (req, res) => {
     res.json({received: true});
 });
 
