@@ -5,6 +5,7 @@ import testRoutes from "./routes/testRoutes.js";
 
 const PORT = 5000;
 
+app.use(express.json());
 app.use("/", testRoutes);
 
 app.listen(PORT, () => {
