@@ -1,22 +1,7 @@
-import express from "express";
-const router = express.Router();
-
 let users = [];
 let currentId = 1;
 
-router.get("/ping", (req, res) => {
-    res.json({ status: "ok" });
-});
-
-router.get("/hello", (req, res) => {
-    res.json({ message: "Hello from backend" });
-});
-
-router.post("/data", (req, res) => {
-    res.json({received: true});
-});
-
-router.post("/user",(req, res) => {
+export const createUser = (req, res) => {
     const {name,role} = req.body;
 
     if(!name || !role) {
@@ -37,14 +22,13 @@ router.post("/user",(req, res) => {
         message: "user received",
         user: newUser
     });
-});
+};
 
-router.get("/users", (req, res) => {
+export const getUsers = (req, res) => {
     res.json(users);
-});
+};
 
-router.get("/user/:id", (req,res) => {
-    console.log("Route hit");
+export const getUserById = (req, res) => {
     const id = parseInt(req.params.id);
 
     const user = users.find(u => u.id === id);
@@ -55,9 +39,9 @@ router.get("/user/:id", (req,res) => {
         });
     }
     res.json(user);
-});
+};
 
-router.put("/user/:id", (req, res) => {
+export const updateUser = (req,res) => {
     const id = parseInt(req.params.id);
     const { name, role } = req.body;
 
@@ -82,9 +66,9 @@ router.put("/user/:id", (req, res) => {
         message: "User updated",
         user
     });
-});
+};
 
-router.delete("/user/:id", (req, res) => {
+export const deleteUser = (req,res) => {
     const id = parseInt(req.params.id);
 
     const index = users.findIndex(u => u.id === id);
@@ -100,6 +84,4 @@ router.delete("/user/:id", (req, res) => {
     res.json({
         message: "User deleted"
     });
-});
- 
-export default router;
+};
