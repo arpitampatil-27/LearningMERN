@@ -1,57 +1,7 @@
-let users = [];
-let currentId = 1;
+import User from "../models/User.js";
 
-export const createUser = (req, res) => {
-    const {name,role} = req.body;
-
-    if(!name || !role) {
-        return res.status(400).json({
-            error: "name and role are required"
-        });
-    }
-
-    const newUser = {
-        id: currentId++,
-        name,
-        role
-    };
-
-    users.push(newUser);
-
-    res.status(201).json({
-        message: "user received",
-        user: newUser
-    });
-};
-
-export const getUsers = (req, res) => {
-    res.json(users);
-};
-
-export const getUserById = (req, res) => {
-    const id = parseInt(req.params.id);
-
-    const user = users.find(u => u.id === id);
-
-    if(!user) {
-        return res.status(404).json({
-            error: "User not found"
-        });
-    }
-    res.json(user);
-};
-
-export const updateUser = (req,res) => {
-    const id = parseInt(req.params.id);
+export const createUser = async (req, res) => {
     const { name, role } = req.body;
-
-    const user = users.find(u => u.id === id);
-
-    if (!user) {
-        return res.status(404).json({
-            error: "User not found"
-        });
-    }
 
     if (!name || !role) {
         return res.status(400).json({
@@ -59,29 +9,70 @@ export const updateUser = (req,res) => {
         });
     }
 
-    user.name = name;
-    user.role = role;
+    const newUser = await User.create({ name, role });
 
-    res.json({
-        message: "User updated",
-        user
-    });
+    res.status(201).json(newUser);
 };
 
-export const deleteUser = (req,res) => {
-    const id = parseInt(req.params.id);
-
-    const index = users.findIndex(u => u.id === id);
-
-    if (index === -1) {
-        return res.status(404).json({
-            error: "User not found"
-        });
+export const getUsers = async (req, res) => {
+    try {
+        const users = await User.find();
+        res.json(users);
+    } catch (error) {
+        res.status(500).json({ error: "server error" });
     }
+};
 
-    users.splice(index, 1);
+export const getUserById = async (req, res) => {
+    try {
+        const user = await User.findById(req.params.id);
 
-    res.json({
-        message: "User deleted"
-    });
+        if (!user) {
+            return res.status(404).json({
+                error: "User not found"
+            });
+        }
+        res.json(user);
+    } catch (error) {
+        res.status(500).json({ error: "server error" });
+    }
+};
+
+export const updateUser = async (req, res) => {
+    try {
+        const { name, role } = req.body;
+
+        const updateUser = await User.findByIdAndUpdate(
+            req.params.id,
+            { name, role },
+            { new: true }
+        );
+
+        if (!updateUser) {
+            return res.status(400).json({ error: "User not found" });
+        }
+
+        res.json(updateUser);
+    } catch (error) {
+        res.status(500).json({ error: "server error" });
+    }
+};
+
+export const deleteUser = async (req, res) => {
+    try {
+        const deletedUser = await User.findByIdAndDelete(req.params.id);
+
+
+        if (!deletedUser) {
+            return res.status(404).json({
+                error: "User not found"
+            });
+        }
+
+        res.json({
+            message: "User deleted"
+        });
+    } catch (error) {
+        res.status(500).json({ error: "server error" });
+    }
 };
